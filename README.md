@@ -1,7 +1,7 @@
-# can.bacon
+# can.eventstream
 
-`can.bacon` is
-[hosted at Github](http://github.com/zkat/can.bacon). `can.bacon` is a
+`can.eventstream` is
+[hosted at Github](http://github.com/zkat/can.eventstream). `can.eventstream` is a
 public domain work, dedicated using
 [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). Feel free to do
 whatever you want with it.
@@ -10,9 +10,9 @@ whatever you want with it.
 
 ### Install
 
-`$ npm install can.bacon`
+`$ npm install can.eventstream`
 or
-`$ bower install can.bacon`
+`$ bower install can.eventstream`
 
 Prebuilt releases are included in `dist`. Releases tagged as `full` include
 `Bacon`, `jQuery`, and `CanJS` in a single package. The others expect the other
@@ -38,28 +38,30 @@ compute(2);
 
 # Introduction
 
-`can.bacon` is a [CanJS](https://github.com/bitovi/canjs) plugin that lets you
-create [Bacon.js](https://github.com/baconjs/bacon.js) `EventStream`s and
-`Property`s from `CanJS` event handlers, as well as feed `Bacon` observable
-streams back into `CanJS` observables. The result is a delicious,
-canned-bacon-flavored mix of
-[FRP](https://en.wikipedia.org/wiki/Functional_reactive_programming) and
-`CanJS`-style declarative MVC.
+`can.eventstream` is a [CanJS](https://github.com/bitovi/canjs) plugin that
+provides a simple, generic `EventStream` interface for integrating
+[FRP](https://en.wikipedia.org/wiki/Functional_reactive_programming)-like
+systems into `CanJS`.
 
-Check out `dist/sandbox.html` and `dist/sandbox.js` for some rough usage
-examples, including a fairly short drag-and-drop demo using `can.Component`, and
-super-simple, single-line two-way binding between pairs of computes and pairs of
-`can.Map`s.
+When used in tandem with an implementing plugin, such as
+[can.bacon](https://github.com/zkat/can.bacon), it results in a fancy new
+event binding experience, closely integrated with all the relevant `CanJS` APIs.
 
 # Documentation
 
 ## CanJS
 
-`can.bacon` extends the event binding features of `CanJS` so they return
-`EventStream`s whenever an event callback is omitted. It also takes steps to
+**This interface is only available when an implementing plugin is
+  included. `can.eventstream` will not work by itself.**
+
+`can.eventstream` extends the event binding features of `CanJS` so they return
+`EventStream`s whenever an event callback is omitted. . It also takes steps to
 normalize event information into a single, consistent event object, depending on
 the type of event source. For example, all list events, regardless of event
 name, have the same structure.
+
+The examples below assume [can.bacon](https://github.com/zkat/can.bacon) has
+been included.
 
 ### `can.bind.call(this[, event="change"[, callback]])`
 
@@ -253,22 +255,12 @@ two-way binding out of the box, since `add` events will bounce back and forth
 infinitely and cause an overflow. One-way binding works fine, though, and can
 easily handle lists of different lengths.
 
-## Bacon.js
+### `can.bindComputeFromStream(stream[, compute=can.compute()])`
 
-`can.bacon` adds a few methods to `Bacon.Observable.prototype` (which applies to
-both `EventStream`s and `Property`s) to generate observable `CanJS` observable
-objects straight from these `Bacon` observables. These objects can then be
-passed into `CanJS` features like live-bound views, and will be 'fed' by stream
-data. They can also be used as a way to easily synchronize (or even partially
-synchronize) multiple `CanJS` observables.
+Returns a `can.compute` whose value changes whenever `stream` has a new value If
+a compute is provided, it will be used instead of creating a new one.
 
-### `Bacon.Observable#toCanCompute([compute=can.compute()])`
-
-Returns a `can.compute` whose value changes whenever `observable`'s value
-changes. If a compute is provided, it will be used instead of creating a new
-one.
-
-### `Bacon.Observable#toCanMap([map=new can.Map()])`
+### `can.bindMapFromStream(stream[, map=new can.Map()])`
 
 Returns a `can.Map` whose value is managed by a stream of incoming map change
 events.
@@ -296,7 +288,7 @@ Two kinds of event objects are accepted:
 }
 ```
 
-### `Bacon.Observable#toCanList([list=new can.List()])`
+### `can.bindListFromStream(stream[, list=new can.List()])`
 
 Returns a `can.List` whose value is managed by a stream of incoming list
 and/or map change events.
@@ -330,3 +322,40 @@ Three kinds of event objects are accepted:
                                            http://canjs.com/docs/can.List.prototype.attr.html#sig_list_attr_elements__replaceCompletely__
 }
 ```
+
+## Plugin API
+
+The API described here must be used by implementor plugins in order to provide
+`EventStream`s to `CanJS`. Currently, `can.eventstream` supports only a single
+global plugin loaded into an instance of `can`.
+
+An example implementation of this plugin using
+[bacon.js](https://github.com/baconjs/bacon.js) is available as
+[can.bacon](https://github.com/zkat/can.bacon)
+
+### `can.isEventStream(stream)`
+
+Must be implemented by a can.eventstream plugin.
+
+Returns a truthy value if `stream` is a compatible event stream.
+
+### `can.bindEventStream(context, event, selector)`
+
+Must be implemented by a can.eventstream plugin.
+
+Returns an event stream that will listen to events, using the given `event` and
+`selector` parameters.
+
+### `can.onEventStreamValue(stream, callback)`
+
+Must be implemented by a can.eventstream plugin.
+
+Binds `callback` such that it will be called on `stream` values. Callback
+invocation mechanics are left to the implementing plugin.
+
+### `can.eventStreamUntil(stream, until)`
+
+Must be implemented by a can.eventstream plugin.
+
+Returns an event stream that will terminate as soon as a new value becomes
+available in the given `until` stream.

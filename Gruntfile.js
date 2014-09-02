@@ -29,9 +29,9 @@ module.exports = function(grunt) {
           }]
         }
       },
-      lib: {entry: {"can.eventstream": "./src/can.js"}},
+      lib: {entry: {"can.eventstream": "./src/index.js"}},
       libMin: {
-        entry: {"can.eventstream.min": "./src/can.js"},
+        entry: {"can.eventstream.min": "./src/index.js"},
         plugins: [new webpack.optimize.UglifyJsPlugin({compressor:{warnings:false}})]
       }
     }

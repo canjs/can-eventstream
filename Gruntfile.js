@@ -20,26 +20,7 @@ module.exports = function(grunt) {
           path: __dirname + "/dist/",
           filename: "[name].js"
         },
-        resolve: {
-          alias: {
-            "can/eventstream": "./can.js"
-          }
-        },
-        externals: {
-          can: "umd can",
-          jquery: {
-            "root": "jQuery",
-            "commonjs": "jquery",
-            "commonjs2": "jquery",
-            "amd": "jquery"
-          },
-          bacon: {
-            "root": "Bacon",
-            "commonjs": "bacon",
-            "commonjs2": "bacon",
-            "amd": "bacon"
-          }
-        },
+        externals: {can: "umd can"},
         devtool: "#sourcemap",
         module: {
           loaders: [{
@@ -48,9 +29,9 @@ module.exports = function(grunt) {
           }]
         }
       },
-      lib: {entry: {"can.bacon": "./src/index.js"}},
+      lib: {entry: {"can.eventstream": "./src/can.js"}},
       libMin: {
-        entry: {"can.bacon.min": "./src/index.js"},
+        entry: {"can.eventstream.min": "./src/can.js"},
         plugins: [new webpack.optimize.UglifyJsPlugin({compressor:{warnings:false}})]
       }
     }

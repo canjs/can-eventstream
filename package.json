@@ -1,14 +1,14 @@
 {
-  "name": "can.bacon",
+  "name": "can.eventstream",
   "version": "0.0.5",
-  "description": "Bacon.js integration for CanJS",
+  "description": "EventStream API plugin for CanJS",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/zkat/can.bacon"
+    "url": "git://github.com/zkat/can.eventstream"
   },
   "keywords": [
     "bacon",
@@ -20,13 +20,11 @@
   "author": "Kat Marchán <kzm@sykosomatic.org>",
   "license": "CC0",
   "bugs": {
-    "url": "https://github.com/zkat/can.bacon/issues"
+    "url": "https://github.com/zkat/can.eventstream/issues"
   },
-  "homepage": "https://github.com/zkat/can.bacon",
+  "homepage": "https://github.com/zkat/can.eventstream",
   "dependencies": {
-    "canjs": "~2",
-    "jquery": "^2.1.1",
-    "baconjs": "^0.7.13"
+    "canjs": "~2"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
@@ -35,7 +33,6 @@
     "grunt-webpack": "^1.0.6",
     "grunt-mocha-test": "^0.10.2",
     "execSync": "^1.0.1-pre",
-    "transform-loader": "^0.2.0",
-    "bacon-browser": "0.0.5"
+    "transform-loader": "^0.2.0"
   }
 }

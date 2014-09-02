@@ -1,5 +1,14 @@
 # can.eventstream
 
+`can.eventstream` is a [CanJS](https://github.com/bitovi/canjs) plugin that
+provides a simple, generic `EventStream` interface for integrating
+[FRP](https://en.wikipedia.org/wiki/Functional_reactive_programming)-like
+systems into `CanJS`.
+
+When used in tandem with an implementing plugin, such as
+[can.bacon](https://github.com/zkat/can.bacon), it results in a fancy new
+event binding experience, closely integrated with all the relevant `CanJS` APIs.
+
 `can.eventstream` is
 [hosted at Github](http://github.com/zkat/can.eventstream). `can.eventstream` is a
 public domain work, dedicated using
@@ -14,38 +23,8 @@ whatever you want with it.
 or
 `$ bower install can.eventstream`
 
-Prebuilt releases are included in `dist`. Releases tagged as `full` include
-`Bacon`, `jQuery`, and `CanJS` in a single package. The others expect the other
-libraries to have already been loaded.
-
-### Example
-
-```javascript
-var compute = can.compute(),
-    property = compute.bind();
-
-property.log("Property has new value:");
-
-compute(1);
-
-property.toCanCompute().bind("change", function() {
-  console.log("compute updated from property change.");
-});
-
-compute(2);
-
-```
-
-# Introduction
-
-`can.eventstream` is a [CanJS](https://github.com/bitovi/canjs) plugin that
-provides a simple, generic `EventStream` interface for integrating
-[FRP](https://en.wikipedia.org/wiki/Functional_reactive_programming)-like
-systems into `CanJS`.
-
-When used in tandem with an implementing plugin, such as
-[can.bacon](https://github.com/zkat/can.bacon), it results in a fancy new
-event binding experience, closely integrated with all the relevant `CanJS` APIs.
+Prebuilt releases are included in `dist`. These expect `CanJS` to be either
+globally loaded, or available through `CommonJS` or `AMD` modules.
 
 # Documentation
 

@@ -472,7 +472,7 @@ can.bindMapFromStream = function(stream, map=new can.Map()) {
  * // Modification event. Modifies a single index or key.
  * {
  *   how: "set"|"add"|"remove", // The type of operation.
- *   which: String|Integer, // The key to modify.
+ *   which|index: String|Integer, // The key to modify.
  *   value: Any, // The value to set. For "add" on an Integer index, must be an
  *                  Array-like. Optional for `remove`.
  * }

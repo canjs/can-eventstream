@@ -3,7 +3,7 @@ module.exports = function(grunt) {
       sh = require("execSync");
   require("es6ify").traceurOverrides = {blockBinding: true};
   grunt.loadNpmTasks("grunt-webpack");
-  grunt.loadNpmTasks("grunt-mocha-test");
+  grunt.loadNpmTasks("testee");
   grunt.initConfig({
     mochaTest: {
       test: {

@@ -37,10 +37,10 @@ module can from "can";
  *
  * @param context - The context to listen to events on. `can.bind` and
  *                        `can.delegate` may be used.
- * @param event - Name of event to listen to.
  * @param selector - Subselector to delegate on, if any.
- * @param {EventStream} until - `EventStream` that will notify when the current
- *                              stream should stop firing.
+ * @param event - Name of event to listen to.
+ *
+ * @returns EventStream
  */
 
 /**
@@ -75,12 +75,10 @@ var oldBind = can.bind;
  *
  */
 can.bind = function(ev, cb) {
-  if (cb && can.isEventStream(this)) {
-    return can.onEventStreamValue(this, cb);
-  } else if (cb){
-    return oldBind.apply(this, arguments);
+  if (cb){
+    return oldBind.call(this, ev, cb);
   } else {
-    return can.bindEventStream(this, ev);
+    return can.bindEventStream(this, ev || "change");
   }
 };
 
@@ -116,7 +114,7 @@ can.delegate = function(selector, ev, cb) {
   if (cb) {
     return oldDelegate.apply(this, arguments);
   } else {
-    return can.bindEventStream(this, ev, selector);
+    return can.bindEventStream(this, ev || "change", selector);
   }
 };
 
@@ -149,7 +147,7 @@ var oldBindAndSetup = can.bindAndSetup;
 can.bindAndSetup = function(ev, cb) {
   return cb ?
     oldBindAndSetup.apply(this, arguments) :
-    can.bindEventStream(this, ev);
+    can.bind.call(this, ev);
 };
 
 var oldControlOn = can.Control.prototype.on;
@@ -268,7 +266,11 @@ can.Control.prototype.on = function(ctx, selector, eventName, func) {
  * console.log(map1.attr(), map2.attr());
  * // {x:2}, {x:2}
  */
-can.Map.prototype.bind = can.bindAndSetup;
+can.Map.bind = can.Map.on = can.bindAndSetup;
+var oldCanMapBind = can.Map.prototype.bind;
+can.Map.prototype.bind = function(ev="change", cb) {
+  return oldCanMapBind.call(this, ev, cb);
+};
 can.Map.prototype.getEventValueForStream = function(args) {
   switch (args[0] && args[0].type) {
   case "change":

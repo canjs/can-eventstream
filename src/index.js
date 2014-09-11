@@ -335,8 +335,8 @@ function MapChangeEvent(args) {
  *   event: Object // The CanJS event object.
  *   which: String // They attr/key affected by the event,
  *   how: "add"|"remove"|"set" // The type of operation,
- *   value: Any // For "add"/"set" events, the new value. For "remove" events,
- *                 the removed value.
+ *   value: Array // For "add"/"set" events, the new values. For "remove" events,
+ *                // the removed values.
  * }
  *
  * Note that these objects conform to the API required for `Bacon.toCanList` and
@@ -473,8 +473,8 @@ can.bindMapFromStream = function(stream, map=new can.Map()) {
  * {
  *   how: "set"|"add"|"remove", // The type of operation.
  *   which|index: String|Integer, // The key to modify.
- *   value: Any, // The value to set. For "add" on an Integer index, must be an
- *                  Array-like. Optional for `remove`.
+ *   value: Array-like, // The value to set. For "add" on an Integer index, must be an
+ *                      // Array-like. Optional for `remove`.
  * }
  *
  * // Replacement event. Calls `.replace()`
@@ -522,41 +522,46 @@ function syncAsMap(map, val) {
   }
 }
 
-function syncAsList(list, val) {
-  var isMapEvent = val.hasOwnProperty("which") || isNaN(val.index);
-  if (isMapEvent && val.how !== "replace") {
-    syncAsMap(list, val);
+function syncAsList(list, event) {
+  var isMapEvent = event.hasOwnProperty("which") || isNaN(event.index);
+  if (isMapEvent && event.how !== "replace") {
+    syncAsMap(list, event);
   } else {
-    switch (val.how) {
+    switch (event.how) {
     case "set":
-      list.attr(val.index, val.value);
+      list.attr(event.index, event.value);
       break;
     case "add":
       // TODO - tag lists and/or events with some magical number (like.. a
       // batchnum-style thing) to prevent circular additions when two-way
       // binding. Please name it: "___PRAISE_THE_SUN___"
-      list.splice.apply(list, [val.index, 0].concat(val.value));
+      if (!event.value || !event.value.length) {
+        console.warn("'add' events sent to lists must have an array-like as their value");
+      }
+      list.splice.apply(list, [event.index, 0].concat([event.value]));
       break;
     case "remove":
-      list.splice(Math.min(val.index, !list.length?0:list.length-1),
-                  val.value ? val.value.length : 1);
+      list.splice(event.index,
+                  event.value ? event.value.length : 1);
+      // list.splice(Math.min(val.index, !list.length?0:list.length-1),
+      //             event.value ? event.value.length : 1);
       break;
     case "replace":
-      if (val.hasOwnProperty("removeOthers")) {
-        list.attr(val.value, val.removeOthers);
+      if (event.hasOwnProperty("removeOthers")) {
+        list.attr(event.value, event.removeOthers);
       } else {
-        list.replace(val.value);
+        list.replace(event.value);
       }
       break;
     case undefined:
-      console.warn("Missing event type on change event: ", val);
-      list.replace(val.value);
+      console.warn("Missing event type on change event: ", event);
+      list.replace(event.value);
       break;
     default:
-      console.warn("Unexpected event type: ", val.how);
+      console.warn("Unexpected event type: ", event.how);
       // idk you're giving it to me so I'll shove it in. It's your own fault
       // if it breaks. You voided the warranty. Be thankful for the log :)
-      list.replace(val.value);
+      list.replace(event.value);
     }
   }
 }

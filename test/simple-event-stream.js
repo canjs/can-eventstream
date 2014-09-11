@@ -2,6 +2,10 @@ function EventStream() {
   this.callbacks = [];
 }
 
+EventStream.prototype.push = function(val) {
+  this.callbacks.forEach(function(cb) { cb(val); });
+};
+
 can.isEventStream = function(stream) {
   return stream instanceof EventStream;
 };
@@ -13,8 +17,7 @@ can.onEventStreamValue = function(stream, callback) {
 can.bindEventStream = function(ctx, ev, selector) {
   var stream = new EventStream();
   function callback() {
-    var data = chooseEventData(ctx, arguments, ev);
-    stream.callbacks.forEach(function(cb) { cb(data); });
+    stream.push(chooseEventData(ctx, arguments, ev));
   }
   if (selector) {
     can.delegate.call(ctx, selector, ev, callback);
@@ -27,7 +30,7 @@ can.bindEventStream = function(ctx, ev, selector) {
 can.eventStreamUntil = function(stream, until) {
   var newStream = new EventStream();
   can.onEventStreamValue(stream, function(data) {
-    newStream.callbacks.forEach(function(cb) { cb(data); });
+    newStream.push(data);
   });
   can.onEventStreamValue(until, function() {
     newStream.callbacks = [];

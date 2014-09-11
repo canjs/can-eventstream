@@ -308,31 +308,35 @@ The API described here must be used by implementor plugins in order to provide
 `EventStream`s to `CanJS`. Currently, `can.eventstream` supports only a single
 global plugin loaded into an instance of `can`.
 
+In order to implement this API, an object named EventStream must be added to the
+`can` namespace. This object can be anything, provided it has the following 4
+functions in it.
+
 An example implementation of this plugin using
 [bacon.js](https://github.com/baconjs/bacon.js) is available as
 [can.bacon](https://github.com/zkat/can.bacon)
 
-### `can.isEventStream(stream)`
+### `can.EventStream.isEventStream(stream)`
 
 Must be implemented by a can.eventstream plugin.
 
 Returns a truthy value if `stream` is a compatible event stream.
 
-### `can.bindEventStream(context, event, selector)`
+### `can.EventStream.bind(context, event, selector)`
 
 Must be implemented by a can.eventstream plugin.
 
 Returns an event stream that will listen to events, using the given `event` and
 `selector` parameters.
 
-### `can.onEventStreamValue(stream, callback)`
+### `can.EventStream.onValue(stream, callback)`
 
 Must be implemented by a can.eventstream plugin.
 
 Binds `callback` such that it will be called on `stream` values. Callback
 invocation mechanics are left to the implementing plugin.
 
-### `can.eventStreamUntil(stream, until)`
+### `can.EventStream.untilStream(stream, until)`
 
 Must be implemented by a can.eventstream plugin.
 

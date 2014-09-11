@@ -1,7 +1,7 @@
 module can from "can";
 
 /**
- * @function can.isEventStream
+ * @function can.EventStream.isEventStream
  *
  * Must be implemented by a can.eventstream plugin.
  *
@@ -12,7 +12,7 @@ module can from "can";
  */
 
 /**
- * @function can.onEventStreamValue
+ * @function can.EventStream.onValue
  *
  * Must be implemented by a can.eventstream plugin.
  *
@@ -28,17 +28,32 @@ module can from "can";
  */
 
 /**
- * @function can.bindEventStream
+ * @function can.EventStream.bind
  *
  * Must be implemented by a can.eventstream plugin.
  *
  * Returns an event stream that will listen to events, using the given
- * parameters, until the `until` stream receives a value.
+ * parameters.
  *
  * @param context - The context to listen to events on. `can.bind` and
  *                        `can.delegate` may be used.
  * @param selector - Subselector to delegate on, if any.
  * @param event - Name of event to listen to.
+ *
+ * @returns EventStream
+ */
+
+/**
+ * @function can.EventStream.untilStream
+ *
+ * Must be implemented by a can.eventstream plugin.
+ *
+ * Returns an event stream that will return values until `until` receives a
+ * value.
+ *
+ * @param {EventStream} stream - Stream to return values from.
+ * @param {EventStream} until - Stream that will notify when returned stream
+ *                              should stop piping data from `stream`
  *
  * @returns EventStream
  */
@@ -78,7 +93,7 @@ can.bind = function(ev, cb) {
   if (cb){
     return oldBind.call(this, ev, cb);
   } else {
-    return can.bindEventStream(this, ev || "change");
+    return can.EventStream.bind(this, ev || "change");
   }
 };
 
@@ -114,7 +129,7 @@ can.delegate = function(selector, ev, cb) {
   if (cb) {
     return oldDelegate.apply(this, arguments);
   } else {
-    return can.bindEventStream(this, ev || "change", selector);
+    return can.EventStream.bind(this, ev || "change", selector);
   }
 };
 
@@ -198,8 +213,8 @@ can.Control.prototype.on = function(ctx, selector, eventName, func) {
   if (!ctx) {
     return oldControlOn.apply(this, arguments);
   }
-  if (can.isEventStream(ctx)) {
-    return can.eventStreamUntil(ctx, can.bind.call(this, "destroyed"));
+  if (can.EventStream.isEventStream(ctx)) {
+    return can.EventStream.untilStream(ctx, can.bind.call(this, "destroyed"));
   } else {
     return oldControlOn.apply(this, arguments);
   }
@@ -426,7 +441,7 @@ function ListChangeEvent(args) {
  * If a compute is provided, it will be used instead of creating a new one.
  */
 can.bindComputeFromStream = function(stream, compute=can.compute()) {
-  can.onEventStreamValue(stream, compute);
+  can.EventStream.onValue(stream, compute);
   return compute;
 };
 
@@ -455,7 +470,7 @@ can.bindComputeFromStream = function(stream, compute=can.compute()) {
  * }
  */
 can.bindMapFromStream = function(stream, map=new can.Map()) {
-  can.onEventStreamValue(stream, (ev) => syncAsMap(map, ev));
+  can.EventStream.onValue(stream, (ev) => syncAsMap(map, ev));
   return map;
 };
 
@@ -491,7 +506,7 @@ can.bindMapFromStream = function(stream, map=new can.Map()) {
  * }
  */
 can.bindListFromStream = function(stream, list=new can.List()) {
-  can.onEventStreamValue(stream, (ev) => syncAsList(list, ev));
+  can.EventStream.onValue(stream, (ev) => syncAsList(list, ev));
   return list;
 };
 

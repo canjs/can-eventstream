@@ -1,14 +1,14 @@
 function assertStream(x) {
-  return assert.ok(can.isEventStream(x));
+  return assert.ok(can.EventStream.isEventStream(x));
 }
 
 describe("can.eventstream", function() {
   describe("CanJS API", function() {
     describe("can.bind", function(){
       it("returns a stream if no callback is given", function() {
-        assertStream(can.bind.call(can.compute(), "what"));
         assertStream(can.bind.call("body", "click"));
         assertStream(can.bind.call($("body"), "click"));
+        assertStream(can.bind.call(can.compute(), "what"));
         assertStream(can.bind.call(new can.Map(), "click"));
         assertStream(can.bind.call(new can.List(), "click"));
       });
@@ -24,7 +24,7 @@ describe("can.eventstream", function() {
       it("returns an event stream if an event stream is passed in", function() {
         var MyControl = can.Control.extend({}, {
           init: function() {
-            assertStream(this.on(new EventStream()));
+            assertStream(this.on(new can.EventStream()));
           }
         });
         new MyControl($("<div>"));
@@ -38,7 +38,7 @@ describe("can.eventstream", function() {
       it("triggers stream events with the new value when the compute changes", function(done) {
         var c = can.compute(),
             val = {};
-        can.onEventStreamValue(c.bind("change"), function(e) {
+        can.EventStream.onValue(c.bind("change"), function(e) {
           assert.ok(e);
           assert.equal(e, val);
           done();
@@ -48,7 +48,7 @@ describe("can.eventstream", function() {
       it("defaults to the 'change' event if no event name is given", function(done) {
         var c = can.compute(),
             val = {};
-        can.onEventStreamValue(c.bind(), function(e) {
+        can.EventStream.onValue(c.bind(), function(e) {
           assert.ok(e);
           assert.equal(e, val);
           done();
@@ -71,7 +71,7 @@ describe("can.eventstream", function() {
       it("returns correct event for 'change' event", function() {
         var map = new can.Map({x: 1}),
             called = false;
-        can.onEventStreamValue(map.bind("change"), function(e) {
+        can.EventStream.onValue(map.bind("change"), function(e) {
           assertMapChangeEvent(e, {
             which: "x",
             how: "set",
@@ -85,7 +85,7 @@ describe("can.eventstream", function() {
       it("defaults to the 'change' event if no event name is given", function() {
         var map = new can.Map({x: 1}),
             called = false;
-        can.onEventStreamValue(map.bind(), function(e) {
+        can.EventStream.onValue(map.bind(), function(e) {
           called = true;
         });
         map.attr("x", 2);
@@ -101,7 +101,7 @@ describe("can.eventstream", function() {
       it("returns correct event for 'change' event", function() {
         var list = new can.List(),
             called = false;
-        can.onEventStreamValue(list.bind("change"), function(e) {
+        can.EventStream.onValue(list.bind("change"), function(e) {
           var expected = {
             index: 0,
             how: "add",
@@ -119,7 +119,7 @@ describe("can.eventstream", function() {
       it("defaults to the 'change' event if no event name is given", function() {
         var list = new can.List(),
             called = false;
-        can.onEventStreamValue(list.bind(), function(e) {
+        can.EventStream.onValue(list.bind(), function(e) {
           assert.equal(e.how, "add");
           called = true;
         });
@@ -161,7 +161,7 @@ describe("can.eventstream", function() {
     });
     describe("can.bindMapFromStream", function() {
       it("returns a new map if none is given", function() {
-        var stream = new EventStream;
+        var stream = new can.EventStream;
         assert.ok(can.bindMapFromStream(stream) instanceof can.Map);
       });
       it("returns the passed-in map if one is given", function() {
@@ -199,7 +199,7 @@ describe("can.eventstream", function() {
         assert.deepEqual(map2.attr(), {x: "yay", y: 1});
       });
       it("handles the 'add' event", function() {
-        var stream = new EventStream(),
+        var stream = new can.EventStream(),
             map = can.bindMapFromStream(stream, new can.Map({y: 2}));
         stream.push({
           how: "add",
@@ -217,7 +217,7 @@ describe("can.eventstream", function() {
                          "Property is updated if it already existed");
       });
       it("handles the 'set' event", function() {
-        var stream = new EventStream(),
+        var stream = new can.EventStream(),
             map = can.bindMapFromStream(stream, new can.Map({y: 2}));
         stream.push({
           how: "set",
@@ -235,7 +235,7 @@ describe("can.eventstream", function() {
                          "Property is updated if it already existed");
       });
       it("removes properties when the 'remove' event happens", function() {
-        var stream = new EventStream(),
+        var stream = new can.EventStream(),
             map = can.bindMapFromStream(stream, new can.Map({x: 1}));
         stream.push({
           how: "remove",
@@ -253,7 +253,7 @@ describe("can.eventstream", function() {
                          "Nothing happens if the property doesn't exist");
       });
       it("changes and adds properties a 'replace' event happens", function() {
-        var stream = new EventStream(),
+        var stream = new can.EventStream(),
             map = can.bindMapFromStream(stream);
         map.attr("y", 2);
         stream.push({
@@ -264,7 +264,7 @@ describe("can.eventstream", function() {
         assert.deepEqual(map.attr(), {x: 1, y: 2});
       });
       it("Removes other properties if the removeOthers field is true", function() {
-        var stream = new EventStream(),
+        var stream = new can.EventStream(),
             map = can.bindMapFromStream(stream);
         map.attr("y", 2);
         stream.push({
@@ -277,7 +277,7 @@ describe("can.eventstream", function() {
     });
     describe("can.bindListFromStream", function(){
       it("returns a new list if none is given", function() {
-        var stream = new EventStream;
+        var stream = new can.EventStream;
         assert.ok(can.bindListFromStream(stream) instanceof can.List);
       });
       it("returns the passed-in list if one is given", function() {
@@ -316,7 +316,7 @@ describe("can.eventstream", function() {
         assert.deepEqual(list2.attr("x"), "yay");
       });
       it("handles the 'add' event", function() {
-        var stream = new EventStream(),
+        var stream = new can.EventStream(),
             list = can.bindListFromStream(stream, new can.List([1]));
         stream.push({
           how: "add",
@@ -334,7 +334,7 @@ describe("can.eventstream", function() {
                          "Item is spliced into the index if it already existed");
       });
       it("handles the 'set' event", function() {
-        var stream = new EventStream(),
+        var stream = new can.EventStream(),
             list = can.bindListFromStream(stream, new can.List([1]));
         stream.push({
           how: "set",
@@ -352,7 +352,7 @@ describe("can.eventstream", function() {
                          "Index is updated if it already existed");
       });
       it("removes indices when the 'remove' event happens", function() {
-        var stream = new EventStream(),
+        var stream = new can.EventStream(),
             list = can.bindListFromStream(stream, new can.List([1,2]));
         stream.push({
           how: "remove",
@@ -370,7 +370,7 @@ describe("can.eventstream", function() {
                          "Nothing happens if the index doesn't exist");
       });
       it("changes and adds indices a 'replace' event happens", function() {
-        var stream = new EventStream(),
+        var stream = new can.EventStream(),
             list = can.bindListFromStream(stream, new can.List([1,2,3,4]));
         stream.push({
           how: "replace",
@@ -380,7 +380,7 @@ describe("can.eventstream", function() {
         assert.deepEqual(list.attr(), [5,6,3,4]);
       });
       it("Removes other indices if the removeOthers field is true", function() {
-        var stream = new EventStream(),
+        var stream = new can.EventStream(),
             list = can.bindMapFromStream(stream, new can.List([1,2,3,4]));
         stream.push({
           how: "replace",

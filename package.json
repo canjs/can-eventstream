@@ -24,17 +24,17 @@
   },
   "homepage": "https://github.com/zkat/can.eventstream",
   "dependencies": {
-    "canjs": "~2",
-    "mocha": "^1.21.4"
+    "canjs": "~2"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
     "webpack": "^1.1.11",
-    "webpack-dev-server": "^1.2.7",
     "grunt-webpack": "^1.0.6",
     "execSync": "^1.0.1-pre",
     "transform-loader": "^0.2.0",
     "es6ify": "1.1.0",
-    "testee": "^0.1.0"
+    "mocha": "^1.21.4",
+    "testee": "^0.1.0",
+    "jquery": "^2.1.1"
   }
 }

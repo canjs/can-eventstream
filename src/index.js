@@ -568,6 +568,9 @@ function syncAsList(list, event) {
         list.replace(event.value);
       }
       break;
+    case "splice":
+      list.splice.apply(list, [event.index, event.howMany].concat(event.value));
+      break;
     case undefined:
       console.warn("Missing event type on change event: ", event);
       list.replace(event.value);

@@ -35,6 +35,6 @@
     "execSync": "^1.0.1-pre",
     "transform-loader": "^0.2.0",
     "es6ify": "1.1.0",
-    "can.bacon": "0.0.6"
+    "testee": "^0.1.0"
   }
 }

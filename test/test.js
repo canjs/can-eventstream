@@ -7,7 +7,7 @@ describe("can.eventstream", function() {
     describe("can.bind", function(){
       it("returns a stream if no callback is given", function() {
         assertStream(can.bind.call("body", "click"));
-        assertStream(can.bind.call($("body"), "click"));
+        assertStream(can.bind.call(can.$("body"), "click"));
         assertStream(can.bind.call(can.compute(), "what"));
         assertStream(can.bind.call(new can.Map(), "click"));
         assertStream(can.bind.call(new can.List(), "click"));
@@ -27,9 +27,17 @@ describe("can.eventstream", function() {
             assertStream(this.on(new can.EventStream()));
           }
         });
-        new MyControl($("<div>"));
+        new MyControl(document.createElement("div"));
       });
-      it("Only listens to events as long as the control hasn't been destroyed yet");
+      it("Only listens to events until the control has been destroyed yet", function() {
+        var MyControl = can.Control.extend({}, {
+          init: function() {
+            this.baseStream = new can.EventStream();
+            this.limitedStream = this.on(new can.EventStream());
+          }
+        });
+        var ctrl = new MyControl(document.createElement("div"));
+      });
     });
     describe("can.compute#bind", function(){
       it("returns a stream if no callback is given", function() {

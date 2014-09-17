@@ -60,12 +60,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var can = __webpack_require__(1);
 	var oldBind = can.bind;
 	can.bind = function(ev, cb) {
-	  if (cb && can.isEventStream(this)) {
-	    return can.onEventStreamValue(this, cb);
-	  } else if (cb) {
-	    return oldBind.apply(this, arguments);
+	  if (cb) {
+	    return oldBind.call(this, ev, cb);
 	  } else {
-	    return can.bindEventStream(this, ev);
+	    return can.EventStream.bind(this, ev || "change");
 	  }
 	};
 	var oldDelegate = can.delegate;
@@ -73,25 +71,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (cb) {
 	    return oldDelegate.apply(this, arguments);
 	  } else {
-	    return can.bindEventStream(this, ev, selector);
+	    return can.EventStream.bind(this, ev || "change", selector);
 	  }
 	};
 	var oldBindAndSetup = can.bindAndSetup;
 	can.bindAndSetup = function(ev, cb) {
-	  return cb ? oldBindAndSetup.apply(this, arguments) : can.bindEventStream(this, ev);
+	  return cb ? oldBindAndSetup.apply(this, arguments) : can.bind.call(this, ev);
 	};
 	var oldControlOn = can.Control.prototype.on;
 	can.Control.prototype.on = function(ctx, selector, eventName, func) {
 	  if (!ctx) {
 	    return oldControlOn.apply(this, arguments);
 	  }
-	  if (can.isEventStream(ctx)) {
-	    return can.eventStreamUntil(ctx, can.bind.call(this, "destroyed"));
+	  if (can.EventStream.isEventStream(ctx)) {
+	    return can.EventStream.untilStream(ctx, can.bind.call(this, "destroyed"));
 	  } else {
 	    return oldControlOn.apply(this, arguments);
 	  }
 	};
-	can.Map.prototype.bind = can.bindAndSetup;
+	can.Map.bind = can.Map.on = can.bindAndSetup;
+	var oldCanMapBind = can.Map.prototype.bind;
+	can.Map.prototype.bind = function() {
+	  var ev = arguments[0] !== (void 0) ? arguments[0] : "change";
+	  var cb = arguments[1];
+	  return oldCanMapBind.call(this, ev, cb);
+	};
 	can.Map.prototype.getEventValueForStream = function(args) {
 	  switch (args[0] && args[0].type) {
 	    case "change":
@@ -154,19 +158,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	can.bindComputeFromStream = function(stream) {
 	  var compute = arguments[1] !== (void 0) ? arguments[1] : can.compute();
-	  can.onEventStreamValue(stream, compute);
+	  can.EventStream.onValue(stream, compute);
 	  return compute;
 	};
 	can.bindMapFromStream = function(stream) {
 	  var map = arguments[1] !== (void 0) ? arguments[1] : new can.Map();
-	  can.onEventStreamValue(stream, (function(ev) {
+	  can.EventStream.onValue(stream, (function(ev) {
 	    return syncAsMap(map, ev);
 	  }));
 	  return map;
 	};
 	can.bindListFromStream = function(stream) {
 	  var list = arguments[1] !== (void 0) ? arguments[1] : new can.List();
-	  can.onEventStreamValue(stream, (function(ev) {
+	  can.EventStream.onValue(stream, (function(ev) {
 	    return syncAsList(list, ev);
 	  }));
 	  return list;
@@ -195,35 +199,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	      map.attr(val);
 	  }
 	}
-	function syncAsList(list, val) {
-	  var isMapEvent = val.hasOwnProperty("which") || isNaN(val.index);
-	  if (isMapEvent && val.how !== "replace") {
-	    syncAsMap(list, val);
+	function syncAsList(list, event) {
+	  var isMapEvent = event.hasOwnProperty("which") || isNaN(event.index);
+	  if (isMapEvent && event.how !== "replace") {
+	    syncAsMap(list, event);
 	  } else {
-	    switch (val.how) {
+	    switch (event.how) {
 	      case "set":
-	        list.attr(val.index, val.value);
+	        list.attr(event.index, event.value);
 	        break;
 	      case "add":
-	        list.splice.apply(list, [val.index, 0].concat(val.value));
+	        if (!event.value || !event.value.length) {
+	          console.warn("'add' events sent to lists must have an array-like as their value");
+	        }
+	        list.splice.apply(list, [event.index, 0].concat([event.value]));
 	        break;
 	      case "remove":
-	        list.splice(Math.min(val.index, !list.length ? 0 : list.length - 1), val.value ? val.value.length : 1);
+	        list.splice(event.index, event.value ? event.value.length : 1);
 	        break;
 	      case "replace":
-	        if (val.hasOwnProperty("removeOthers")) {
-	          list.attr(val.value, val.removeOthers);
+	        if (event.hasOwnProperty("removeOthers")) {
+	          list.attr(event.value, event.removeOthers);
 	        } else {
-	          list.replace(val.value);
+	          list.replace(event.value);
 	        }
 	        break;
+	      case "splice":
+	        list.splice.apply(list, [event.index, event.howMany].concat(event.value));
+	        break;
 	      case undefined:
-	        console.warn("Missing event type on change event: ", val);
-	        list.replace(val.value);
+	        console.warn("Missing event type on change event: ", event);
+	        list.replace(event.value);
 	        break;
 	      default:
-	        console.warn("Unexpected event type: ", val.how);
-	        list.replace(val.value);
+	        console.warn("Unexpected event type: ", event.how);
+	        list.replace(event.value);
 	    }
 	  }
 	}

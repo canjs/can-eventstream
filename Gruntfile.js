@@ -5,12 +5,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-webpack");
   grunt.loadNpmTasks("testee");
   grunt.initConfig({
-    mochaTest: {
-      test: {
-        src: ["src/test.js"],
-        options: {
-        }
-      }
+    testee: {
+      local: ["./test/test.html"]
     },
     webpack: {
       options: {
@@ -38,7 +34,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask("default", ["test", "build"]);
-  grunt.registerTask("test", ["mochaTest:test"]);
+  grunt.registerTask("test", ["testee:local"]);
   grunt.registerTask("build", ["webpack:lib", "webpack:libMin"]);
   grunt.registerTask("dev", ["webpack:lib:keepalive"]);
   grunt.registerTask("update-build", "Commits the built version", function() {

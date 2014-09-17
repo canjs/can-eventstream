@@ -1,8 +1,21 @@
-* archive [0/0]
-* backlog [0/9]
-** TODO set up test suite                                                :qa:
-** TODO Generate docs                                                   :dox:
-** TODO TodoMVC                                                         :dox:
+* archive [7/7]
+** DONE Write README.md                                                 :dox:
+   CLOSED: [2014-05-21 Wed 22:40]
+** DONE Run a first release                                           :build:
+   CLOSED: [2014-05-21 Wed 22:41]
+** DONE Deploy to npm and bower for the first tiem                    :build:
+   CLOSED: [2014-09-03 Wed 13:24]
+** DONE set up test suite                                                :qa:
+   CLOSED: [2014-09-04 Thu 20:09]
+** DONE Write API test suite                                             :qa:
+   CLOSED: [2014-09-11 Thu 16:04]
+** DONE s/toCan/to/                                                     :api:
+   CLOSED: [2014-09-11 Thu 16:22]
+   This applies more to can.bacon and can.rx, but I'm keeping things in this
+   todo list.
+** DONE Move plugin API into can.eventstream namespace                  :api:
+   CLOSED: [2014-09-11 Thu 16:22]
+* backlog [0/5]
 ** TODO Easier/nicer way to manually create events                      :api:
 ** TODO Two-way binding of Lists                                        :api:
 ** TODO Improve can.List getEventValue semantics                        :api:
@@ -10,10 +23,11 @@
    value back.
 ** TODO Don't initialize compute properties if compute has no init val  :api:
 ** TODO Easy, single-command deployment                               :build:
+* active [1/6]
+** DONE Write working prototype for filtered lists                      :api:
+   CLOSED: [2014-09-16 Tue 12:38]
+** TODO Make release with new API changes                               :api:
+** TODO Generate docs                                                   :dox:
+** TODO Write an introductory article                                   :dox:
+** TODO TodoMVC                                                         :dox:
 ** TODO Test using Travis-ci                                             :qa:
-* active [2/4]
-** DONE Write README.md                                                 :dox:
-   CLOSED: [2014-05-21 Wed 22:40]
-** DONE Run a first release                                           :build:
-   CLOSED: [2014-05-21 Wed 22:41]
-** TODO Deploy to npm and bower for the first tiem                    :build:

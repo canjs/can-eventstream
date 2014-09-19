@@ -23,11 +23,20 @@
    value back.
 ** TODO Don't initialize compute properties if compute has no init val  :api:
 ** TODO Easy, single-command deployment                               :build:
-* active [1/6]
+* active [4/9]
 ** DONE Write working prototype for filtered lists                      :api:
    CLOSED: [2014-09-16 Tue 12:38]
-** TODO Make release with new API changes                               :api:
-** TODO Generate docs                                                   :dox:
+** DONE Make release with new API changes                               :api:
+   CLOSED: [2014-09-19 Fri 09:56]
+** DONE Write a proper can.Control#on                                   :api:
+   CLOSED: [2014-09-19 Fri 12:02]
+   I don't know if it's right to try to disambiguate between delegation and
+   local methods by scanning control properties before deciding.
+** DONE unbinding for can.bindXFromStream                               :api:
+   CLOSED: [2014-09-19 Fri 16:26]
+   Maybe `can.unbind.call(X, streamBoundToX)`?
+** TODO Tests and documentation for splice event                        :api:
 ** TODO Write an introductory article                                   :dox:
+** TODO Generate docs                                                   :dox:
 ** TODO TodoMVC                                                         :dox:
 ** TODO Test using Travis-ci                                             :qa:

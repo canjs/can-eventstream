@@ -376,9 +376,10 @@ function MapChangeEvent(args) {
  *                // the removed values.
  * }
  *
- * Note that these objects conform to the API required for `Bacon.toCanList` and
- * `Bacon.toCanMap` respectively, so the `EventStream` returned by this function
- * can be piped into a different `can.List` or `can.Map` to synchronise both.
+ * Note that these objects conform to the API required for
+ * `can.bindListFromStream` and `can.bindMapFromStream` respectively, so the
+ * `EventStream` returned by this function can be piped into a different
+ * `can.List` or `can.Map` to synchronise both.
  *
  * Unlike the stream returned by `can.Map#bind()`, this one cannot be used for
  * two-way binding out of the box, since `add` events will bounce back and forth

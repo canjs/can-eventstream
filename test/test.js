@@ -198,6 +198,20 @@ describe("can.eventstream", function() {
         assert.equal(compute1(), 4);
         assert.equal(compute2(), 4);
       });
+      it("can be unbound with can.unbind and can.compute#unbind", function() {
+        var stream = new can.EventStream(),
+            compute = can.bindComputeFromStream(stream, can.compute(1));
+        stream.push(2);
+        assert.ok(compute.unbind(stream));
+        stream.push(3);
+        assert.equal(compute(), 2);
+        can.bindComputeFromStream(stream, compute);
+        stream.push(4);
+        assert.equal(compute(), 4, "binding again works");
+        assert.ok(can.unbind.call(compute, stream));
+        stream.push(5);
+        assert.equal(compute(), 4);
+      });
     });
     describe("can.bindMapFromStream", function() {
       it("returns a new map if none is given", function() {
@@ -314,6 +328,36 @@ describe("can.eventstream", function() {
         });
         assert.deepEqual(map.attr(), {x: 1});
       });
+      it("can be unbound with can.unbind and can.Map#unbind", function() {
+        var stream = new can.EventStream(),
+            map = can.bindMapFromStream(stream, new can.Map({x: 1}));
+        stream.push({
+          how: "set",
+          which: "x",
+          value: 2
+        });
+        assert.ok(map.unbind(stream));
+        stream.push({
+          how: "set",
+          which: "x",
+          value: 3
+        });
+        assert.equal(map.attr("x"), 2);
+        can.bindMapFromStream(stream, map);
+        stream.push({
+          how: "set",
+          which: "x",
+          value: 4
+        });
+        assert.equal(map.attr("x"), 4, "binding again works");
+        assert.ok(can.unbind.call(map, stream));
+        stream.push({
+          how: "set",
+          which: "x",
+          value: 5
+        });
+        assert.equal(map.attr("x"), 4);
+      });
     });
     describe("can.bindListFromStream", function(){
       it("returns a new list if none is given", function() {
@@ -428,6 +472,36 @@ describe("can.eventstream", function() {
           removeOthers: true
         });
         assert.deepEqual(list.attr(), [5,6]);
+      });
+      it("can be unbound with can.unbind and can.List#unbind", function() {
+        var stream = new can.EventStream(),
+            list = can.bindListFromStream(stream, new can.List([1]));
+        stream.push({
+          how: "set",
+          index: 0,
+          value: 2
+        });
+        assert.ok(list.unbind(stream));
+        stream.push({
+          how: "set",
+          index: 0,
+          value: 3
+        });
+        assert.equal(list.attr(0), 2);
+        can.bindListFromStream(stream, list);
+        stream.push({
+          how: "set",
+          index: 0,
+          value: 4
+        });
+        assert.equal(list.attr(0), 4, "binding again works");
+        assert.ok(can.unbind.call(list, stream));
+        stream.push({
+          how: "set",
+          index: 0,
+          value: 5
+        });
+        assert.equal(list.attr(0), 4);
       });
     });
   });

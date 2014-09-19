@@ -133,6 +133,41 @@ can.delegate = function(selector, ev, cb) {
   }
 };
 
+var oldUnbind = can.unbind;
+/**
+ * @function can.unbind
+ *
+ * Extends `can.unbind()` such that if it's called with an `EventStream` as the
+ * event and no handler, it unbinds an attached stream from `this`. Otherwise,
+ * it will revert to the default behavior.
+ *
+ * This override is primarily for the purpose of undoing the effects
+ * `can.bind[X]FromStream()` family of functions. Once this function is called,
+ * the bound objects will no longer listen for changes from the stream, and the
+ * stream will be garbage collectable once again (since binding in this way
+ * forces them to actually bind and stick around).
+ *
+ * See http://canjs.com/docs/can.unbind.html for documentation on the default
+ * behavior.
+ */
+can.unbind = function(ev, handler) {
+  if (!handler && can.EventStream.isEventStream(ev)) {
+    if (this.___unbinders) {
+      for (var i = 0; i < this.___unbinders.length; i++) {
+        if (this.___unbinders[i][0] === ev) {
+          this.___unbinders[i][1]();
+          this.___unbinders.splice(i, 1);
+          break;
+        }
+      }
+    }
+    return this;
+  } else {
+    return oldUnbind.apply(this, arguments);
+  }
+};
+
+
 /**
  * @function can.compute#bind
  *
@@ -155,6 +190,12 @@ can.delegate = function(selector, ev, cb) {
  * // compute changed 2
  */
 
+/**
+ * @function can.compute#unbind
+ *
+ * See documentation for `can.unbind()`
+ */
+
 
 var oldBindAndSetup = can.bindAndSetup;
 // Mostly internal, but used to replace the `.bind()` behavior for all
@@ -163,6 +204,15 @@ can.bindAndSetup = function(ev, cb) {
   return cb ?
     oldBindAndSetup.apply(this, arguments) :
     can.bind.call(this, ev);
+};
+
+var oldUnbindAndTeardown = can.unbindAndTeardown;
+can.unbindAndTeardown = function(ev, cb) {
+  if (!cb && can.EventStream.isEventStream(ev)) {
+    return can.unbind.call(this, ev);
+  } else {
+    return oldUnbindAndTeardown.apply(this, arguments);
+  }
 };
 
 var oldControlOn = can.Control.prototype.on;
@@ -325,6 +375,21 @@ can.Map.prototype.getEventValueForStream = function(args) {
   }
 };
 
+/**
+ * @function can.Map#unbind
+ *
+ * See documentation for `can.unbind()`
+ */
+can.Map.unbind = can.Map.off = can.unbindAndTeardown;
+var oldCanMapUnbind = can.Map.prototype.unbind;
+can.Map.prototype.unbind = function(ev, cb) {
+  if (!cb && can.EventStream.isEventStream(ev)) {
+    return can.unbind.call(this, ev);
+  } else {
+    return oldCanMapBind.apply(this, arguments);
+  }
+};
+
 function MapChangeEvent(args) {
   this.event = args[0];
   this.which = args[1];
@@ -421,6 +486,12 @@ can.List.prototype.getEventValueForStream = function(args) {
   }
 };
 
+/**
+ * @function can.List#unbind
+ *
+ * See documentation for `can.unbind()`
+ */
+
 function ListChangeEvent(args) {
   this.event = args[0];
   switch (this.event.type) {
@@ -464,7 +535,8 @@ function ListChangeEvent(args) {
  * If a compute is provided, it will be used instead of creating a new one.
  */
 can.bindComputeFromStream = function(stream, compute=can.compute()) {
-  can.EventStream.onValue(stream, compute);
+  if (!compute.___unbinders) { compute.___unbinders = []; }
+  compute.___unbinders.push([stream, can.EventStream.onValue(stream, compute)]);
   return compute;
 };
 
@@ -493,7 +565,11 @@ can.bindComputeFromStream = function(stream, compute=can.compute()) {
  * }
  */
 can.bindMapFromStream = function(stream, map=new can.Map()) {
-  can.EventStream.onValue(stream, (ev) => syncAsMap(map, ev));
+  if (!map.___unbinders) { map.___unbinders = []; }
+  map.___unbinders.push([
+    stream,
+    can.EventStream.onValue(stream, (ev) => syncAsMap(map, ev))
+  ]);
   return map;
 };
 
@@ -529,7 +605,11 @@ can.bindMapFromStream = function(stream, map=new can.Map()) {
  * }
  */
 can.bindListFromStream = function(stream, list=new can.List()) {
-  can.EventStream.onValue(stream, (ev) => syncAsList(list, ev));
+  if (!list.___unbinders) { list.___unbinders = []; }
+  list.___unbinders.push([
+    stream,
+    can.EventStream.onValue(stream, (ev) => syncAsList(list, ev))
+  ]);
   return list;
 };
 

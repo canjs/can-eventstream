@@ -11,6 +11,10 @@ can.EventStream.isEventStream = function(stream) {
 };
 can.EventStream.onValue = function(stream, callback) {
   stream.callbacks.push(callback);
+  return function() {
+    var index = stream.callbacks.indexOf(callback);
+    if (~index) { stream.callbacks.splice(index, 1); }
+  };
 };
 can.EventStream.bind = function(ctx, ev, selector) {
   var stream = new can.EventStream();

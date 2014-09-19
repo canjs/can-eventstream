@@ -98,9 +98,10 @@ compute(2);
 
 Enhances `can.Control#on` (and by extension, `can.Component#events#on`) so it
 can be used to listen to event streams in a memory-safe way, according to the
-control/component's lifecycle. The behavior of this method changes *only* if the
-first argument is `instanceof Bacon.Observe`, in which case all other arguments
-are ignored..
+control/component's lifecycle. Since the default method accepts method names,
+this overridden method will first check if the possible `callback` is an
+existing property, if it's a string, before determining whether to fall back
+to the default behavior, or to return an event stream.
 
 See http://canjs.com/docs/can.Control.prototype.on.html
 

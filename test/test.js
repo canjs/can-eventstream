@@ -1,5 +1,5 @@
-function assertStream(x) {
-  return assert.ok(can.EventStream.isEventStream(x));
+function assertStream(x, desc) {
+  return assert.ok(can.EventStream.isEventStream(x), desc);
 }
 
 describe("can.eventstream", function() {
@@ -21,6 +21,38 @@ describe("can.eventstream", function() {
       it("defaults to the 'change' event if no event name is given");
     });
     describe("can.Control#on", function(){
+      it("returns a stream if no callback is given", function() {
+        var MyControl = can.Control.extend({}, {
+          init: function() {
+            assertStream(this.on("click"));
+            assertStream(this.on(can.$(window), "li", "click"));
+            assert.ok(!can.EventStream.isEventStream(
+              this.on("li", "click", "frob")));
+            assert.ok(!can.EventStream.isEventStream(
+              this.on(can.$(window), "li", "click", "frob")));
+            assertStream(this.on("frob"),
+                         "method exists but not in a handler name position");
+            var compute = can.compute(),
+                stream1 = this.on(compute, "change"),
+                stream2 = this.on(compute),
+                execCount = 0;
+            assertStream(stream1);
+            assertStream(stream2);
+            can.EventStream.onValue(stream1, function(val) {
+              assert.equal(val, "success");
+              execCount++;
+            });
+            can.EventStream.onValue(stream2, function(val) {
+              assert.equal(val, "success");
+              execCount++;
+            });
+            compute("success");
+            assert.equal(execCount, 2, "Both callbacks executed");
+          },
+          frob: function() {}
+        });
+        new MyControl(document.createElement("div"));
+      });
       it("returns an event stream if an event stream is passed in", function() {
         var MyControl = can.Control.extend({}, {
           init: function() {

@@ -171,33 +171,29 @@ var oldControlOn = can.Control.prototype.on;
  *
  * Enhances `can.Control#on` (and by extension, `can.Component#events#on`) so it
  * can be used to listen to event streams in a memory-safe way, according to the
- * control/component's lifecycle. The behavior of this method changes *only* if
- * `can.EventStream.isEventStream` returns true for the first argument, in which
- * case, all other arguments are ignored.
+ * control/component's lifecycle. Since the default method accepts method names,
+ * this overridden method will first check if the possible `callback` is an
+ * existing property, if it's a string, before determining whether to fall back
+ * to the default behavior, or to return an event stream.
  *
  * See http://canjs.com/docs/can.Control.prototype.on.html
  *
  *
- * @param {Any} [context=this.element] - The object to listen for events on. If
- *                                       this object is an `EventStream`, this
- *                                       method will immediately return a stream
- *                                       that ends automatically if the `this`
- *                                       (the Control or Component) is
- *                                       destroyed.
+ * @param {Any} [context=this.element] - The object to listen for events on.
  * @param {String} [selector] - If provided, the selector to delegate to.
  * @param {String} [event="change"] - The name of the event to listen to.
- * @param {Function} [callback] - Callback to invoke when event fires. If this
- *                                parameter is provided, the method will revert
- *                                to its default behavior.
+ * @param {Function|String} [callback] - Callback or method name to invoke when
+ *                                       event fires. If this parameter is
+ *                                       provided, the method will revert to its
+ *                                       default behavior.
  *
- * @returns EventStream | Observable | Number
+ * @returns EventStream | Number
  *
  * @example
  * ...
  * events: {
  *   inserted: function() {
- *     this.on(GlobalStreams.specialEvent)
- *       .onValue((e) => console.log("special event: ", e);
+ *     this.on(GlobalStreams.specialEvent).log("special event:");
  *   }
  * }
  * ...
@@ -216,7 +212,33 @@ can.Control.prototype.on = function(ctx, selector, eventName, func) {
   if (can.EventStream.isEventStream(ctx)) {
     return can.EventStream.untilStream(ctx, can.bind.call(this, "destroyed"));
   } else {
-    return oldControlOn.apply(this, arguments);
+    if (typeof ctx === "string") {
+      func = eventName;
+      eventName = selector;
+      selector = ctx;
+      ctx = this.element;
+    }
+
+    // ...otherwise, set `selector` to null
+    if (func === undefined) {
+      func = eventName;
+      eventName = selector;
+      selector = null;
+    }
+
+    if (eventName == null) {
+      eventName = "change";
+    }
+
+    if (!func || (typeof func === "string" && !this[func])) {
+      return can.EventStream.untilStream(
+        selector ?
+          can.bind.call(ctx, eventName) :
+          can.delegate.call(ctx, selector, eventName),
+        can.bind.call(this, "destroyed"));
+    } else {
+      return oldControlOn.apply(this, arguments);
+    }
   }
 };
 

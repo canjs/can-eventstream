@@ -74,9 +74,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return can.EventStream.bind(this, ev || "change", selector);
 	  }
 	};
+	var oldUnbind = can.unbind;
+	can.unbind = function(ev, handler) {
+	  if (!handler && can.EventStream.isEventStream(ev)) {
+	    if (this.___unbinders) {
+	      for (var i = 0; i < this.___unbinders.length; i++) {
+	        if (this.___unbinders[i][0] === ev) {
+	          this.___unbinders[i][1]();
+	          this.___unbinders.splice(i, 1);
+	          break;
+	        }
+	      }
+	    }
+	    return this;
+	  } else {
+	    return oldUnbind.apply(this, arguments);
+	  }
+	};
 	var oldBindAndSetup = can.bindAndSetup;
 	can.bindAndSetup = function(ev, cb) {
 	  return cb ? oldBindAndSetup.apply(this, arguments) : can.bind.call(this, ev);
+	};
+	var oldUnbindAndTeardown = can.unbindAndTeardown;
+	can.unbindAndTeardown = function(ev, cb) {
+	  if (!cb && can.EventStream.isEventStream(ev)) {
+	    return can.unbind.call(this, ev);
+	  } else {
+	    return oldUnbindAndTeardown.apply(this, arguments);
+	  }
 	};
 	var oldControlOn = can.Control.prototype.on;
 	can.Control.prototype.on = function(ctx, selector, eventName, func) {
@@ -86,7 +111,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (can.EventStream.isEventStream(ctx)) {
 	    return can.EventStream.untilStream(ctx, can.bind.call(this, "destroyed"));
 	  } else {
-	    return oldControlOn.apply(this, arguments);
+	    if (typeof ctx === "string") {
+	      func = eventName;
+	      eventName = selector;
+	      selector = ctx;
+	      ctx = this.element;
+	    }
+	    if (func === undefined) {
+	      func = eventName;
+	      eventName = selector;
+	      selector = null;
+	    }
+	    if (eventName == null) {
+	      eventName = "change";
+	    }
+	    if (!func || (typeof func === "string" && !this[func])) {
+	      return can.EventStream.untilStream(selector ? can.bind.call(ctx, eventName) : can.delegate.call(ctx, selector, eventName), can.bind.call(this, "destroyed"));
+	    } else {
+	      return oldControlOn.apply(this, arguments);
+	    }
 	  }
 	};
 	can.Map.bind = can.Map.on = can.bindAndSetup;
@@ -107,6 +150,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        return args;
 	      }
+	  }
+	};
+	can.Map.unbind = can.Map.off = can.unbindAndTeardown;
+	var oldCanMapUnbind = can.Map.prototype.unbind;
+	can.Map.prototype.unbind = function(ev, cb) {
+	  if (!cb && can.EventStream.isEventStream(ev)) {
+	    return can.unbind.call(this, ev);
+	  } else {
+	    return oldCanMapBind.apply(this, arguments);
 	  }
 	};
 	function MapChangeEvent(args) {
@@ -158,21 +210,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	can.bindComputeFromStream = function(stream) {
 	  var compute = arguments[1] !== (void 0) ? arguments[1] : can.compute();
-	  can.EventStream.onValue(stream, compute);
+	  if (!compute.___unbinders) {
+	    compute.___unbinders = [];
+	  }
+	  compute.___unbinders.push([stream, can.EventStream.onValue(stream, compute)]);
 	  return compute;
 	};
 	can.bindMapFromStream = function(stream) {
 	  var map = arguments[1] !== (void 0) ? arguments[1] : new can.Map();
-	  can.EventStream.onValue(stream, (function(ev) {
+	  if (!map.___unbinders) {
+	    map.___unbinders = [];
+	  }
+	  map.___unbinders.push([stream, can.EventStream.onValue(stream, (function(ev) {
 	    return syncAsMap(map, ev);
-	  }));
+	  }))]);
 	  return map;
 	};
 	can.bindListFromStream = function(stream) {
 	  var list = arguments[1] !== (void 0) ? arguments[1] : new can.List();
-	  can.EventStream.onValue(stream, (function(ev) {
+	  if (!list.___unbinders) {
+	    list.___unbinders = [];
+	  }
+	  list.___unbinders.push([stream, can.EventStream.onValue(stream, (function(ev) {
 	    return syncAsList(list, ev);
-	  }));
+	  }))]);
 	  return list;
 	};
 	function syncAsMap(map, val) {

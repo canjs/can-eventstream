@@ -77,6 +77,20 @@ behavior.
 ```javascript
 can.delegate.call(window, "a", "click").doAction(".preventDefault").log();
 ```
+### `can.unbind.call(eventName | stream[, handler])`
+
+Extends `can.unbind()` such that if it's called with an `EventStream` as the
+event and no handler, it unbinds an attached stream from `this`. Otherwise, it
+will revert to the default behavior.
+
+This override is primarily for the purpose of undoing the effects
+`can.bind[X]FromStream()` family of functions. Once this function is called, the
+bound objects will no longer listen for changes from the stream, and the stream
+will be garbage collectable once again (since binding in this way forces them to
+actually bind and stick around).
+
+See http://canjs.com/docs/can.unbind.html for documentation on the default
+behavior.
 
 ### `can.compute#bind([event="change"[, callback]])`
 

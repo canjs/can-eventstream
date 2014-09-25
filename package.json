@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/zkat/can.eventstream"
+    "url": "git://github.com/bitovi/can.eventstream"
   },
   "keywords": [
     "bacon",
@@ -20,9 +20,9 @@
   "author": "Kat Marchán <kzm@sykosomatic.org>",
   "license": "CC0",
   "bugs": {
-    "url": "https://github.com/zkat/can.eventstream/issues"
+    "url": "https://github.com/bitovi/can.eventstream/issues"
   },
-  "homepage": "https://github.com/zkat/can.eventstream",
+  "homepage": "https://github.com/bitovi/can.eventstream",
   "dependencies": {
     "canjs": "~2"
   },

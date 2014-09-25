@@ -23,7 +23,7 @@
    value back.
 ** TODO Don't initialize compute properties if compute has no init val  :api:
 ** TODO Easy, single-command deployment                               :build:
-* active [4/9]
+* active [4/14]
 ** DONE Write working prototype for filtered lists                      :api:
    CLOSED: [2014-09-16 Tue 12:38]
 ** DONE Make release with new API changes                               :api:
@@ -35,6 +35,19 @@
 ** DONE unbinding for can.bindXFromStream                               :api:
    CLOSED: [2014-09-19 Fri 16:26]
    Maybe `can.unbind.call(X, streamBoundToX)`?
+** TODO Write debugging system                                          :api:
+   Being able to debug event pipelines is pretty useful, and having first-class
+   support for that debugging cooked into can.Control/can.Component would be
+   lovely. Experiment with it a bit.
+** TODO Rewind stuff                                                    :api:
+   http://elm-lang.org/blog/Introducing-Elm-Reactor.elm
+** TODO Use stealtools as well                                        :build:
+   Something about jquery needing magic. Look at canjs/minor for reference.
+** TODO Draw up an ideal sidebar for the docs                           :dox:
+** TODO Feature requests for docjs                                      :dox:
+*** README updating
+*** #method support for documentation
+*** @example without indent 
 ** TODO Tests and documentation for splice event                        :api:
 ** TODO Write an introductory article                                   :dox:
 ** TODO Generate docs                                                   :dox:

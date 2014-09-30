@@ -1,4 +1,4 @@
-module can from "can";
+import can from "can";
 
 /**
  * @function can.EventStream.isEventStream

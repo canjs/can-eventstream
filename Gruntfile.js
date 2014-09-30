@@ -1,42 +1,36 @@
 module.exports = function(grunt) {
-  var webpack = require("webpack"),
-      sh = require("execSync");
-  require("es6ify").traceurOverrides = {blockBinding: true};
-  grunt.loadNpmTasks("grunt-webpack");
+  var sh = require("execSync");
+  grunt.loadNpmTasks("steal-tools");
   grunt.loadNpmTasks("testee");
   grunt.initConfig({
     testee: {
       local: ["./test/test.html"]
     },
-    webpack: {
-      options: {
-        watch: true,
-        output: {
-          libraryTarget: "umd",
-          path: __dirname + "/dist/",
-          filename: "[name].js"
+    stealPluginify: {
+      lib: {
+        system: {
+          main: "src/index"
         },
-        externals: {can: "umd can"},
-        devtool: "#sourcemap",
-        module: {
-          loaders: [{
-            test: /\.js$/,
-            loader: "transform/cacheable?es6ify"
-          }]
+        options: {},
+        outputs: {
+          "can.eventstream": {
+            ignore: ["can", "jquery"],
+            dest: __dirname + "/dist/can.eventstream.js",
+            minify: false
+          },
+          "can.eventstream.min": {
+            ignore: ["can", "jquery"],
+            dest: __dirname + "/dist/can.eventstream.min.js",
+            minify: true
+          }
         }
-      },
-      lib: {entry: {"can.eventstream": "./src/index.js"}},
-      libMin: {
-        entry: {"can.eventstream.min": "./src/index.js"},
-        plugins: [new webpack.optimize.UglifyJsPlugin({compressor:{warnings:false}})]
       }
     }
   });
 
   grunt.registerTask("default", ["test", "build"]);
   grunt.registerTask("test", ["testee:local"]);
-  grunt.registerTask("build", ["webpack:lib", "webpack:libMin"]);
-  grunt.registerTask("dev", ["webpack:lib:keepalive"]);
+  grunt.registerTask("build", ["stealPluginify"]);
   grunt.registerTask("update-build", "Commits the built version", function() {
     exec([
       "git add ./dist",

@@ -2,7 +2,7 @@
   "name": "can.eventstream",
   "version": "0.3.0",
   "description": "EventStream API plugin for CanJS",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,17 +24,15 @@
   },
   "homepage": "https://github.com/bitovi/can.eventstream",
   "dependencies": {
-    "canjs": "~2"
+    "canjs": "~2.1.0"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
-    "webpack": "^1.1.11",
-    "grunt-webpack": "^1.0.6",
     "execSync": "^1.0.1-pre",
-    "transform-loader": "^0.2.0",
-    "es6ify": "1.1.0",
     "mocha": "^1.21.4",
     "testee": "^0.1.0",
+    "assert": "git://github.com/jgallen23/assert.git#0.1.0",
+    "steal-tools": "git://github.com/bitovi/steal-tools.git#master",
     "jquery": "^2.1.1"
   }
 }

@@ -363,8 +363,10 @@ can.Map.prototype.getEventValueForStream = function(args) {
   case "change":
     return new MapChangeEvent(args);
   default:
-    var target = args[0].target;
-    if (target._data && target._data.hasOwnProperty(args[0].type)) {
+    var target = args[0].target || args[0];
+    if (target.hasOwnProperty("batchNum") ||
+        (target._data &&
+         target._data.hasOwnProperty(args[0].type))) {
       // We found a named property change event, not a generic custom event
       // (maybe, probably)
       return args[1];
@@ -471,7 +473,7 @@ can.List.prototype.getEventValueForStream = function(args) {
   default:
     // This is different from the can.Map version because can.Lists don't have
     // the _data property.
-    var target = args[0].target;
+    var target = args[0].target || args[0];
     var _type = args[0].type;
     if (target.hasOwnProperty(args[0].type)) {
       // We found a named property change event, not a generic custom event
@@ -653,10 +655,12 @@ function syncAsList(list, event) {
       // TODO - tag lists and/or events with some magical number (like.. a
       // batchnum-style thing) to prevent circular additions when two-way
       // binding. Please name it: "___PRAISE_THE_SUN___"
-      if (!event.value || !event.value.length) {
+      var val = event.value;
+      if (!val || !val.length) {
         console.warn("'add' events sent to lists must have an array-like as their value");
+        val = [val];
       }
-      list.splice.apply(list, [event.index, 0].concat([event.value]));
+      list.splice(event.index, 0, ...val);
       break;
     case "remove":
       list.splice(event.index,
@@ -672,7 +676,7 @@ function syncAsList(list, event) {
       }
       break;
     case "splice":
-      list.splice.apply(list, [event.index, event.howMany].concat(event.value));
+      list.splice(event.index, event.howMany, event.value);
       break;
     case undefined:
       console.warn("Missing event type on change event: ", event);

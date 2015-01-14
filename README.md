@@ -6,11 +6,11 @@ provides a simple, generic `EventStream` interface for integrating
 systems into `CanJS`.
 
 When used in tandem with an implementing plugin, such as
-[can.bacon](https://github.com/zkat/can.bacon), it results in a fancy new
+[can.bacon](https://github.com/bitovi/can.bacon), it results in a fancy new
 event binding experience, closely integrated with all the relevant `CanJS` APIs.
 
 `can.eventstream` is
-[hosted at Github](http://github.com/zkat/can.eventstream). `can.eventstream` is a
+[hosted at Github](http://github.com/bitovi/can.eventstream). `can.eventstream` is a
 public domain work, dedicated using
 [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). Feel free to do
 whatever you want with it.
@@ -39,7 +39,7 @@ normalize event information into a single, consistent event object, depending on
 the type of event source. For example, all list events, regardless of event
 name, have the same structure.
 
-The examples below assume [can.bacon](https://github.com/zkat/can.bacon) has
+The examples below assume [can.bacon](https://github.com/bitovi/can.bacon) has
 been included.
 
 ### `can.bind.call(this[, event="change"[, callback]])`
@@ -329,7 +329,7 @@ functions in it.
 
 An example implementation of this plugin using
 [bacon.js](https://github.com/baconjs/bacon.js) is available as
-[can.bacon](https://github.com/zkat/can.bacon)
+[can.bacon](https://github.com/bitovi/can.bacon)
 
 ### `can.EventStream.isEventStream(stream)`
 

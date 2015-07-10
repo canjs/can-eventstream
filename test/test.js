@@ -1,3 +1,9 @@
+require("steal-mocha");
+var can = require("can");
+require("can.eventstream");
+require("./simple-event-stream");
+var assert = require("chai").assert;
+
 function assertStream(x, desc) {
   return assert.ok(can.EventStream.isEventStream(x), desc);
 }

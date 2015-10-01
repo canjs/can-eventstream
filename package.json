@@ -4,11 +4,12 @@
   "description": "EventStream API plugin for CanJS",
   "main": "index.js",
   "scripts": {
+    "build": "node build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/bitovi/can.eventstream"
+    "url": "git://github.com/canjs/can.eventstream"
   },
   "keywords": [
     "bacon",
@@ -20,21 +21,31 @@
   "author": "Kat Marchán <kzm@sykosomatic.org>",
   "license": "CC0",
   "bugs": {
-    "url": "https://github.com/bitovi/can.eventstream/issues"
+    "url": "https://github.com/canjs/can.eventstream/issues"
   },
-  "homepage": "https://github.com/bitovi/can.eventstream",
+  "homepage": "https://github.com/canjs/can.eventstream",
   "dependencies": {
-    "canjs": "~2"
+    "can": "^2.2.6"
   },
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "webpack": "^1.1.11",
-    "grunt-webpack": "^1.0.6",
-    "execSync": "^1.0.1-pre",
-    "transform-loader": "^0.2.0",
-    "es6ify": "1.1.0",
-    "mocha": "^1.21.4",
-    "testee": "^0.1.0",
-    "jquery": "^2.1.1"
+    "chai": "^3.0.0",
+    "steal": "^0.10.5",
+    "steal-mocha": "0.0.2",
+    "steal-tools": "^0.10.7",
+    "testee": "^0.1.0"
+  },
+  "system": {
+    "transpiler": "babel",
+    "directories": {
+      "lib": "src"
+    },
+    "npmDependencies": [
+      "can",
+      "steal-mocha",
+      "chai"
+    ],
+    "map": {
+      "chai": "chai/chai"
+    }
   }
 }

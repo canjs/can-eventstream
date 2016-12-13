@@ -25,14 +25,14 @@
   },
   "homepage": "https://github.com/canjs/can.eventstream",
   "dependencies": {
-    "can": "^2.2.6"
+    "can": "^3.2.2"
   },
   "devDependencies": {
     "chai": "^3.0.0",
-    "steal": "^0.10.5",
-    "steal-mocha": "0.0.2",
-    "steal-tools": "^0.10.7",
-    "testee": "^0.1.0"
+    "steal": "^0.16.43",
+    "steal-mocha": "0.0.3",
+    "steal-tools": "^0.16.8",
+    "testee": "^0.3.0"
   },
   "system": {
     "transpiler": "babel",

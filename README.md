@@ -1,5 +1,7 @@
 # can.eventstream
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-eventstream.svg)](https://greenkeeper.io/)
+
 `can.eventstream` is a [CanJS](https://github.com/bitovi/canjs) plugin that
 provides a simple, generic `EventStream` interface for integrating
 [FRP](https://en.wikipedia.org/wiki/Functional_reactive_programming)-like
